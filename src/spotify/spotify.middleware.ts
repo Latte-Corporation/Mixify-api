@@ -4,13 +4,20 @@ import axios from 'axios';
 
 @Injectable()
 export class SpotifyMiddleware implements NestMiddleware {
-  private readonly clientId = process.env.SPOTIFY_CLIENT_ID; // Ensure these are set in your env
+  private readonly clientId = process.env.SPOTIFY_CLIENT_ID;
   private readonly clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  private accessToken: string | null = null;
+  private tokenExpiration: number | null = null;
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      // Check if an access token already exists (optional optimization)
-      if (!req.headers['spotify-access-token']) {
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (
+        !this.accessToken ||
+        !this.tokenExpiration ||
+        currentTime >= this.tokenExpiration
+      ) {
         const tokenResponse = await axios.post(
           'https://accounts.spotify.com/api/token',
           new URLSearchParams({ grant_type: 'client_credentials' }),
@@ -22,11 +29,11 @@ export class SpotifyMiddleware implements NestMiddleware {
           },
         );
 
-        const accessToken = tokenResponse.data.access_token;
-
-        // Add the access token to the request headers for downstream handlers
-        req.headers['spotify-access-token'] = accessToken;
+        this.accessToken = tokenResponse.data.access_token;
+        this.tokenExpiration = currentTime + tokenResponse.data.expires_in;
       }
+
+      req.headers['spotify-access-token'] = this.accessToken;
       next();
     } catch (error) {
       console.error('Error fetching Spotify access token:', error);
