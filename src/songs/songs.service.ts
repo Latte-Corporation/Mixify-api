@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
+import { time } from 'console';
 
 @Injectable()
 export class SongsService {
@@ -9,7 +10,7 @@ export class SongsService {
     this.prisma = new PrismaClient();
   }
 
-  async submitSong(id: number, accessToken: string) {
+  async submitSong(id: string, accessToken: string) {
     const url = `https://api.spotify.com/v1/tracks/${id}?market=FR`;
 
     try {
@@ -43,12 +44,16 @@ export class SongsService {
         where: {
           status: 'pending',
         },
+        orderBy: {
+          createdAt: 'asc',
+        },
       })
       .then((songs) =>
         songs.map((song) => ({
           id: song.id,
           title: song.title,
           artists: song.artist,
+          submittedAt: song.createdAt,
         })),
       );
   }
@@ -59,13 +64,50 @@ export class SongsService {
         where: {
           status: 'queued',
         },
+        orderBy: {
+          createdAt: 'asc',
+        },
       })
       .then((songs) =>
         songs.map((song) => ({
           id: song.id,
           title: song.title,
           artists: song.artist,
+          submittedAt: song.createdAt,
         })),
       );
+  }
+
+  async approveSong(id: string) {
+    return this.prisma.song.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'queued',
+      },
+    });
+  }
+
+  async passedSong(id: string) {
+    return this.prisma.song.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'passed',
+      },
+    });
+  }
+
+  async rejectSong(id: string) {
+    return this.prisma.song.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'rejected',
+      },
+    });
   }
 }

@@ -27,9 +27,12 @@ export class SpotifyService {
           id: item.id,
           title: item.name,
           artists: item.artists.map((artist: any) => artist.name).join(', '),
-          inQueue: !!(await this.prisma.song.findUnique({
-            where: { id: item.id },
-          })),
+          status:
+            (await this.prisma.song
+              .findUnique({
+                where: { id: item.id },
+              })
+              .then((song) => song?.status)) || 'unknown',
         })),
       );
       return tracks;
