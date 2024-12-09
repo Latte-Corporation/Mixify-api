@@ -18,5 +18,6 @@ model Song {
   title     String
   artist    String
   status    String  @default("pending") // pending, approved, rejected
+  link      String
   createdAt DateTime @default(now())
 }

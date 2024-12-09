@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Post, Req, Sse } from '@nestjs/common';
 import { SongsService } from './songs.service';
-import { interval, map, Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 
 @Controller('songs')
 export class SongsController {

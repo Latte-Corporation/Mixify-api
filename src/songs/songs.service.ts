@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import { time } from 'console';
 
 @Injectable()
 export class SongsService {
@@ -30,6 +29,7 @@ export class SongsService {
           artist: response.data.artists
             .map((artist: any) => artist.name)
             .join(', '),
+          link: response.data.external_urls.spotify,
         },
       });
     } catch (error) {
@@ -54,6 +54,7 @@ export class SongsService {
           title: song.title,
           artists: song.artist,
           submittedAt: song.createdAt,
+          link: song.link,
         })),
       );
   }
@@ -74,6 +75,7 @@ export class SongsService {
           title: song.title,
           artists: song.artist,
           submittedAt: song.createdAt,
+          link: song.link,
         })),
       );
   }
