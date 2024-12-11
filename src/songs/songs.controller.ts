@@ -6,6 +6,7 @@ import { map, Subject } from 'rxjs';
 export class SongsController {
   private readonly songService: SongsService;
   private readonly songAddedSubject = new Subject<any>();
+  private readonly songStatusSubject = new Subject<any>();
 
   constructor() {
     this.songService = new SongsService();
@@ -31,21 +32,31 @@ export class SongsController {
 
   @Post('approve/:id')
   async approveSong(@Param('id') id: string) {
+    this.songStatusSubject.next({ id, status: 'approved' });
     return this.songService.approveSong(id);
   }
 
   @Post('reject/:id')
   async rejectSong(@Param('id') id: string) {
+    this.songStatusSubject.next({ id, status: 'rejected' });
     return this.songService.rejectSong(id);
   }
 
   @Post('passed/:id')
   async passedSong(@Param('id') id: string) {
+    this.songStatusSubject.next({ id, status: 'passed' });
     return this.songService.passedSong(id);
   }
 
   @Sse('sse')
   async sse() {
     return this.songAddedSubject.asObservable().pipe(map((data) => ({ data })));
+  }
+
+  @Sse('status')
+  async status() {
+    return this.songStatusSubject
+      .asObservable()
+      .pipe(map((data) => ({ data })));
   }
 }
