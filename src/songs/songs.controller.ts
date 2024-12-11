@@ -48,6 +48,13 @@ export class SongsController {
     return this.songService.passedSong(id);
   }
 
+  @Post('reset')
+  async reset() {
+    this.songStatusSubject.next({ status: 'reset' });
+    this.songAddedSubject.next({ status: 'reset' });
+    return this.songService.reset();
+  }
+
   @Sse('sse')
   async sse() {
     return this.songAddedSubject.asObservable().pipe(map((data) => ({ data })));

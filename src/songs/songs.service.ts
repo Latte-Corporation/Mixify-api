@@ -112,5 +112,8 @@ export class SongsService {
       },
     });
   }
-}
 
+  async reset() {
+    await this.prisma.song.deleteMany();
+  }
+}
