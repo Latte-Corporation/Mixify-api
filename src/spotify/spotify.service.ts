@@ -22,18 +22,33 @@ export class SpotifyService {
         throw new Error('Failed to fetch data from Spotify API');
       }
 
+      const allSongs = await this.prisma.song.findMany({
+        where: {
+          status: 'queued',
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+
       const tracks = await Promise.all(
-        response.data.tracks.items.map(async (item: any) => ({
-          id: item.id,
-          title: item.name,
-          artists: item.artists.map((artist: any) => artist.name).join(', '),
-          status:
-            (await this.prisma.song
-              .findUnique({
-                where: { id: item.id },
-              })
-              .then((song) => song?.status)) || 'unknown',
-        })),
+        response.data.tracks.items.map(async (item: any) => {
+          const song = await this.prisma.song.findUnique({
+            where: { id: item.id },
+          });
+
+          const place = song
+            ? allSongs.findIndex((s) => s.id === song.id) + 1
+            : null;
+
+          return {
+            id: item.id,
+            title: item.name,
+            artists: item.artists.map((artist: any) => artist.name).join(', '),
+            status: song?.status || null,
+            place,
+          };
+        }),
       );
       return tracks;
     } catch (error) {
