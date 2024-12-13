@@ -1,8 +1,9 @@
 name: Build mixify-api on release
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -46,16 +47,33 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # edit-helm-version:
-  #   name: Edit Helm version
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #     attestations: write
-  #     id-token: write
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+  edit-helm-version:
+    name: Edit Helm version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
 
-  #     - name: Update Helm app version
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          tags: |
+            type=sha
+
+      - name: Update Helm app version
+        run: |
+          sed -i "s/appVersion: \".*\"/appVersion: \"${{ steps.meta.outputs.tags }}\"/g" helm/Chart.yaml
+          git add helm/Chart.yaml
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -m "Update app version to ${{ steps.meta.outputs.tags }}"
+          git push origin ${{ github.ref_name }}
