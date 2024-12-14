@@ -1,5 +1,5 @@
 # Use the official Node.js image
-ARG NODE_VERSION=22.12-alpine
+ARG NODE_VERSION=22.12
 
 FROM node:${NODE_VERSION} AS deps
 
