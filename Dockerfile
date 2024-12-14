@@ -51,7 +51,7 @@ RUN \
 
 FROM node:${NODE_VERSION} AS runner
 
-RUN apk add --update openssl
+# RUN apk add --update openssl
 
 WORKDIR /app
 
