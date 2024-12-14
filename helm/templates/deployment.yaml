@@ -31,19 +31,62 @@ spec:
           command: ['npx']
           args: ['prisma', 'migrate', 'deploy']
           env:
-            DATABASE_URL: postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
-            DATABASE_DIRECT_URL: postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
+            {{- if .Values.database.existingSecret }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: DATABASE_URL
+            - name: DATABASE_DIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: DATABASE_DIRECT_URL
+            {{- else }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
+            - name: DATABASE_DIRECT_URL
+              value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
+            {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- with .Values.spotify }}
-            {{- toYaml . | nindent 12 }}
+            {{- if .Values.spotify.existingSecret }}
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.spotify.existingSecret }}
+                  key: CLIENT_ID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.spotify.existingSecret }}
+                  key: CLIENT_SECRET
+            {{- else }}
+            - name: CLIENT_ID
+              value: "{{ .Values.spotify.CLIENT_ID }}"
+            - name: CLIENT_SECRET
+              value: "{{ .Values.spotify.CLIENT_SECRET }}"
             {{- end }}
-            DATABASE_URL: postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
-            DATABASE_DIRECT_URL: postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
-            
+            {{- if .Values.database.existingSecret }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: DATABASE_URL
+            - name: DATABASE_DIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: DATABASE_DIRECT_URL
+            {{- else }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
+            - name: DATABASE_DIRECT_URL
+              value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
