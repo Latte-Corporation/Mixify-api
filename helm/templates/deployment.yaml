@@ -25,7 +25,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-migrate
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['npx']
@@ -54,21 +54,21 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- if .Values.spotify.existingSecret }}
-            - name: CLIENT_ID
+            - name: SPOTIFY_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.spotify.existingSecret }}
-                  key: CLIENT_ID
-            - name: CLIENT_SECRET
+                  key: SPOTIFY_CLIENT_ID
+            - name: SPOTIFY_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.spotify.existingSecret }}
-                  key: CLIENT_SECRET
+                  key: SPOTIFY_CLIENT_SECRET
             {{- else }}
-            - name: CLIENT_ID
-              value: "{{ .Values.spotify.CLIENT_ID }}"
-            - name: CLIENT_SECRET
-              value: "{{ .Values.spotify.CLIENT_SECRET }}"
+            - name: SPOTIFY_CLIENT_ID
+              value: "{{ .Values.spotify.SPOTIFY_CLIENT_ID }}"
+            - name: SPOTIFY_CLIENT_SECRET
+              value: "{{ .Values.spotify.SPOTIFY_CLIENT_SECRET }}"
             {{- end }}
             {{- if .Values.database.existingSecret }}
             - name: DATABASE_URL

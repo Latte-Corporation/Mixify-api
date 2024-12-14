@@ -20,9 +20,9 @@ database:
   existingSecret: ""
 
 spotify:
-  CLIENT_ID: "your-client-id"
-  CLIENT_SECRET: "your-client-secret"
-  # If existing secret is provided, the above values will be ignored, the secret must have the keys CLIENT_ID and CLIENT_SECRET
+  SPOTIFY_CLIENT_ID: "your-client-id"
+  SPOTIFY_CLIENT_SECRET: "your-client-secret"
+  # If existing secret is provided, the above values will be ignored, the secret must have the keys SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET
   existingSecret: ""
 
 service:
