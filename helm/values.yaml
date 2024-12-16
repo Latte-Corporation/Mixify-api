@@ -19,6 +19,9 @@ database:
   # If existing secret is provided, the above values will be ignored, the secret must have the keys DATABASE_URL and DATABASE_DIRECT_URL
   existingSecret: ""
 
+frontend:
+  url: "http://localhost:3001"
+
 spotify:
   SPOTIFY_CLIENT_ID: "your-client-id"
   SPOTIFY_CLIENT_SECRET: "your-client-secret"

@@ -48,6 +48,8 @@ spec:
             - name: DATABASE_DIRECT_URL
               value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
             {{- end }}
+            - name: FRONTEND_URL
+              value: "{{ .Values.frontend.url }}"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
