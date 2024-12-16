@@ -16,8 +16,7 @@ export class AppController {
     @Body() body: { passKey: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const FRONTEND_URL = process.env.FRONTEND_URL;
-    const domain = FRONTEND_URL.split('://')[1];
+    const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN;
 
     if (await this.appService.isPassKey(body.passKey)) {
       res.cookie('passKey', body.passKey, {
@@ -25,7 +24,7 @@ export class AppController {
         secure: true,
         sameSite: 'none',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        domain: domain,
+        domain: COOKIE_DOMAIN,
       });
     } else {
       res.clearCookie('passKey');

@@ -22,6 +22,9 @@ database:
 frontend:
   url: "http://localhost:3001"
 
+cookie:
+  domain: "localhost"
+
 spotify:
   SPOTIFY_CLIENT_ID: "your-client-id"
   SPOTIFY_CLIENT_SECRET: "your-client-secret"

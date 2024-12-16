@@ -93,6 +93,8 @@ spec:
             {{- end }}
             - name: FRONTEND_URL
               value: "{{ .Values.frontend.url }}"
+            - name: COOKIE_DOMAIN
+              value: "{{ .Values.cookie.domain }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
