@@ -20,7 +20,7 @@ export class AppController {
       res.cookie('passKey', body.passKey, {
         httpOnly: false,
         secure: true,
-        sameSite: 'strict',
+        sameSite: 'none',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       });
     } else {
