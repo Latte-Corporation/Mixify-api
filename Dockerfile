@@ -64,4 +64,4 @@ COPY prisma prisma
 USER node
 
 # Start the server
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
