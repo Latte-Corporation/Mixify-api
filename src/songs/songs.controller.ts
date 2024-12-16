@@ -1,7 +1,17 @@
-import { Controller, Get, Param, Post, Req, Sse } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Sse,
+  UseGuards,
+} from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { map, Subject } from 'rxjs';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('songs')
 export class SongsController {
   private readonly songService: SongsService;
@@ -15,7 +25,11 @@ export class SongsController {
   @Post('submit/:id')
   async submitSong(@Param('id') id: string, @Req() req: Request) {
     const accessToken = req.headers['spotify-access-token'];
-    const result = await this.songService.submitSong(id, accessToken);
+    const result = await this.songService.submitSong(
+      id,
+      accessToken,
+      req['user'],
+    );
     this.songAddedSubject.next({ id, status: 'pending' });
     return result;
   }
@@ -65,5 +79,10 @@ export class SongsController {
     return this.songStatusSubject
       .asObservable()
       .pipe(map((data) => ({ data })));
+  }
+
+  @Sse('events/:id')
+  async events(@Param('id') id: string) {
+    return this.songService.getSongEvents(id);
   }
 }

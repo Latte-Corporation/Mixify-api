@@ -20,5 +20,12 @@ model Song {
   artist    String
   status    String  @default("pending") // pending, approved, rejected
   link      String
+  user      User     @relation(fields: [userId], references: [passKey])
+  userId    String
   createdAt DateTime @default(now())
+}
+
+model User {
+  passKey  String   @id
+  songs    Song[]
 }
