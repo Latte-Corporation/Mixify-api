@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { SpotifyService } from './spotify.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('spotify')
 export class SpotifyController {
   private readonly spotifyService: SpotifyService;

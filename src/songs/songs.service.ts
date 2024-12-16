@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
+import { filter, map, Subject } from 'rxjs';
 
 @Injectable()
 export class SongsService {
   private readonly prisma: PrismaClient;
+  private readonly eventsSubject: Subject<{
+    queueNumber: number;
+    idUser: string;
+  }>;
   constructor() {
     this.prisma = new PrismaClient();
+    this.eventsSubject = new Subject();
   }
 
-  async submitSong(id: string, accessToken: string) {
+  async submitSong(id: string, accessToken: string, user: string) {
     const url = `https://api.spotify.com/v1/tracks/${id}?market=FR`;
 
     try {
@@ -30,6 +36,11 @@ export class SongsService {
             .map((artist: any) => artist.name)
             .join(', '),
           link: response.data.external_urls.spotify,
+          user: {
+            connect: {
+              passKey: user,
+            },
+          },
         },
       });
     } catch (error) {
@@ -81,14 +92,26 @@ export class SongsService {
   }
 
   async approveSong(id: string) {
-    return this.prisma.song.update({
+    const song = await this.prisma.song.update({
       where: {
         id,
       },
       data: {
         status: 'queued',
+        createdAt: new Date(),
       },
     });
+
+    this.eventsSubject.next({
+      queueNumber: await this.prisma.song.count({
+        where: {
+          status: 'queued',
+        },
+      }),
+      idUser: song.userId,
+    });
+
+    return song;
   }
 
   async passedSong(id: string) {
@@ -111,6 +134,13 @@ export class SongsService {
         status: 'rejected',
       },
     });
+  }
+
+  async getSongEvents(id: string) {
+    return this.eventsSubject.asObservable().pipe(
+      filter((event) => event.idUser === id),
+      map((event) => ({ data: event })),
+    );
   }
 
   async reset() {
