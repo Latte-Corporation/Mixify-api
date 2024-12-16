@@ -53,6 +53,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: PORT
+              value: "{{ .Values.service.port }}"
+            - name: VERSION
+              value: "{{ .Chart.AppVersion }}"
             {{- if .Values.spotify.existingSecret }}
             - name: SPOTIFY_CLIENT_ID
               valueFrom:
