@@ -16,12 +16,16 @@ export class AppController {
     @Body() body: { passKey: string },
     @Res({ passthrough: true }) res: Response,
   ) {
+    const FRONTEND_URL = process.env.FRONTEND_URL;
+    const domain = FRONTEND_URL.split('://')[1];
+
     if (await this.appService.isPassKey(body.passKey)) {
       res.cookie('passKey', body.passKey, {
         httpOnly: false,
         secure: true,
         sameSite: 'none',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        domain: domain,
       });
     } else {
       res.clearCookie('passKey');
