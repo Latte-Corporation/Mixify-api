@@ -49,6 +49,7 @@ jobs:
 
   edit-helm-version:
     name: Edit Helm version
+    needs: build-api
     runs-on: ubuntu-latest
     permissions:
       contents: write
