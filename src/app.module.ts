@@ -5,9 +5,10 @@ import { SpotifyMiddleware } from './spotify/spotify.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { SpotifyModule } from './spotify/spotify.module';
 import { SongsModule } from './songs/songs.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), SpotifyModule, SongsModule],
+  imports: [ConfigModule.forRoot(), SpotifyModule, SongsModule, HealthModule],
   controllers: [AppController],
   providers: [AppService, SpotifyMiddleware],
 })
