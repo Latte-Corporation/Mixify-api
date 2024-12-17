@@ -26,7 +26,7 @@ cookie:
   domain: "localhost"
 
 dashboard:
-  password: "password"
+  password: "password1234"
   existingSecret: ""
 
 jwt:
