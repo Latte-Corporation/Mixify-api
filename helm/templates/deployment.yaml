@@ -91,6 +91,26 @@ spec:
             - name: DATABASE_DIRECT_URL
               value: "postgresql://{{ .Values.database.user }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
             {{- end }}
+            {{- if .Values.dashboard.existingSecret }}
+            - name: DASHBOARD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dashboard.existingSecret }}
+                  key: DASHBOARD_PASSWORD
+            {{- else }}
+            - name: DASHBOARD_PASSWORD
+              value: "{{ .Values.dashboard.password }}"
+            {{- end }}
+            {{- if .Values.jwt.existingSecret }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.jwt.existingSecret }}
+                  key: JWT_SECRET
+            {{- else }}
+            - name: JWT_SECRET
+              value: "{{ .Values.jwt.secret }}"
+            {{- end }}
             - name: FRONTEND_URL
               value: "{{ .Values.frontend.url }}"
             - name: COOKIE_DOMAIN
